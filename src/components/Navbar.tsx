@@ -1,7 +1,8 @@
 import { useState} from "react";
 import { MdMenu } from "react-icons/md";
 import { MdArrowBack } from "react-icons/md";
-
+import sanjhikala_logo from '../assets/sanjhikala_logo.jpg'
+import { MdOutlineAccountCircle } from "react-icons/md";
 
 const products:string[] = ['Kurta', 'Salvaar', 'Churidar', 'Pant', 'Plazo', 'Blouse']
 
@@ -28,7 +29,7 @@ function Navbar(){
       <div className="relative h-10 flex justify-between">
         <div>
         <MdMenu
-          className={`absolute text-2xl cursor-pointer m-2 z-2 ${navExtended ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100  transition-opacity duration-300 ease-in-out'}`}
+          className={`absolute text-2xl cursor-pointer m-10 z-2 ${navExtended ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100  transition-opacity duration-300 ease-in-out'}`}
           onClick={handleExtendNav}
         />
         <div
@@ -40,10 +41,10 @@ function Navbar(){
         </div>
         </div>
         <div className="p-2 absolute left-1/2 -translate-x-1/2">
-            <h1>LOGO</h1>
+            <img src={sanjhikala_logo} className= "h-25" alt="Sanjhikala Logo" />
         </div>
-        <div className="p-2">
-            <h2>Account</h2>
+        <div className="p-2 m-9">
+            <MdOutlineAccountCircle className="text-3xl font-light"/>
         </div>
       </div>
       </>)
@@ -55,7 +56,7 @@ export default Navbar
 function ExtendedNavBar({handleShrinkNav}:{handleShrinkNav:()=>void}) {
 
     return <div className="w-60 border-r rounded-xl flex-col h-screen">
-        <div className="w-full  flex justify-end p-2 "><MdArrowBack onClick={handleShrinkNav} className="text-2xl cursor-pointer" /></div>
+        <div className="w-full  flex justify-end p-2 "><MdArrowBack onClick={handleShrinkNav} className="m-2 text-2xl cursor-pointer" /></div>
         <div className="my-2">
             <ul className="my-3 text-center" >
                 {products.map((item, index) => {
