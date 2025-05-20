@@ -17,12 +17,12 @@ function Navbar(){
 
     const handleExtendNav = ():void => {
         setNav(true)
-        console.log(navExtended)
+        //console.log(navExtended)
     }
 
     const handleShrinkNav= ():void => {
         setNav(false)
-        console.log(navExtended)
+        //console.log(navExtended)
     }
 
     return (<>
