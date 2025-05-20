@@ -7,7 +7,7 @@ interface DropProp{
     trigger : boolean
 }
 
-function DropDownMenu(prop:DropProp){
+function DropDownMenu({ children, buttonText, setTrigger, trigger }:DropProp){
 
     const dropDownRef = useRef<HTMLDivElement>(null)
     // const [buttonTitle, setTitle] = useState<string>(prop.buttonText)
@@ -25,7 +25,7 @@ function DropDownMenu(prop:DropProp){
             //event.target is the DOM that was clicked so basically we are checking if the part clicked is not inside our referenced DOM
             //---> (event.target as Node) means the (type) of target on which we are checking is of type Node
             if(dropDownRef.current && !dropDownRef.current.contains(event.target as Node)){
-                prop.setTrigger(false)
+                setTrigger(false)
             }
         }
 
@@ -37,11 +37,11 @@ function DropDownMenu(prop:DropProp){
         }
 
     }
-        ,[prop.setTrigger])
+        ,[setTrigger])
 
 return (<div className="absolute" ref={dropDownRef}>
-        <div onClick={()=>prop.setTrigger(!prop.trigger)} className="p-2 bg-neutral-900 hover:bg-neutral-800 border rounded">{prop.buttonText}</div>
-        <div className={`bg-neutral-900 max-h-50 overflow-y-auto ${prop.trigger ? "visible" : "invisible h-0"}`}>{prop.children}</div>
+        <div onClick={()=>setTrigger(!trigger)} className="p-2 bg-neutral-900 hover:bg-neutral-800 border rounded">{buttonText}</div>
+        <div className={`bg-neutral-900 max-h-50 overflow-y-auto ${trigger ? "visible" : "invisible h-0"}`}>{children}</div>
  </div>
     )   
 }
