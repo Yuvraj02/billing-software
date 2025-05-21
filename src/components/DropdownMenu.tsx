@@ -5,9 +5,10 @@ interface DropProp{
     buttonText : string
     setTrigger : React.Dispatch<SetStateAction<boolean>>
     trigger : boolean
+    className?:string
 }
 
-function DropDownMenu({ children, buttonText, setTrigger, trigger }:DropProp){
+function DropDownMenu({className, children, buttonText, setTrigger, trigger }:DropProp){
 
     const dropDownRef = useRef<HTMLDivElement>(null)
     // const [buttonTitle, setTitle] = useState<string>(prop.buttonText)
@@ -39,9 +40,9 @@ function DropDownMenu({ children, buttonText, setTrigger, trigger }:DropProp){
     }
         ,[setTrigger])
 
-return (<div className="absolute" ref={dropDownRef}>
-        <div onClick={()=>setTrigger(!trigger)} className="p-2 bg-neutral-900 hover:bg-neutral-800 border rounded">{buttonText}</div>
-        <div className={`bg-neutral-900 max-h-50 overflow-y-auto ${trigger ? "visible" : "invisible h-0"}`}>{children}</div>
+return (<div className="absolute w-full" ref={dropDownRef}>
+        <div onClick={()=>setTrigger(!trigger)} className={className}>{buttonText}</div>
+        <div className={` bg-neutral-900 max-h-50 overflow-y-auto ${trigger ? "visible" : "invisible h-0"}`}>{children}</div>
  </div>
     )   
 }

@@ -1,13 +1,7 @@
-export class CustomerModel {
-    id:number
+export interface CustomerModel {
+    customer_id:number
     name:string
     email?:string
     phone:string
-
-    constructor(id:number, name:string, email:string, phone:string){
-        this.id = id
-        this.name = name
-        this.email = email
-        this.phone = phone
-    }
+    [key:string] : string | number | undefined
 }

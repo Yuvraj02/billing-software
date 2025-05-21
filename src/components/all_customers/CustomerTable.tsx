@@ -1,36 +1,22 @@
-//TODO : ADD BILL MODAL AND FUNCTIONS
-
 import { useState } from "react"
 import SearchBar from "../SearchBar"
 import AddCustomerModal from "../add_customer/AddCustomerModal";
-
-interface DataItem {
-    ID: number,
-    Name: string,
-    Email: string,
-    Phone: string,
-    [key: string]: string | number //Making the key as a string and value can be a number or a string
-    //Here key is the property
-}
+import type { CustomerModel } from "../../models/CustomerModel";
+import { useAppSelector } from "../../hooks";
 
 function CustomerTable() {
 
     //Hooks Related to table
     const [isOpenModal, setOpen] = useState<boolean>(false)
-    const [tableColumns, setColumns] = useState<string[]>(["ID", "Name", "Email", "Phone",])
-    const [data, setData] = useState<DataItem[]>([{ ID: 9000, Name: "Yuvraj Singh Bhadoria", Email: "yuvrajsinghbhadoria@gmail.com", Phone: "8770805985" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
-    { ID: 2000, Name: "John", Email: "test234@gmail.com", Phone: "9120303425" },
+    const tableColumns:string[] = ["ID", "Name", "Email", "Phone"]
+    const columMap = new Map<string, string>([
+        ["ID", "customer_id"],
+        ["Name", "name"],
+        ["Email", "email"],
+        ["Phone", "phone"]
     ])
-
+    
+      const data = useAppSelector((state) => state.customers.customersData);
 
     return (<>
         <div className="m-25  p-6 border rounded-2xl max-h-48 md:max-h-96 lg:max-h-100 overflow-y-auto">
@@ -64,11 +50,14 @@ function CustomerTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((dataItem) => {
-                            return (<tr key={dataItem.id} className="space hover:bg-gray-800">
+                        {data.map((dataItem:CustomerModel) => {
+                            return (<tr key={dataItem.customer_id} className="space hover:bg-gray-800">
                                 {tableColumns.map((column) => {
-                                    return (<td key={`${dataItem.id}-${column}`}className=" max-w-0.5 px-4 py-2 border text-sm font-light overflow-x-auto whitespace-nowrap" >
-                                        {dataItem[column]}
+                                    
+                                    //Here we will get actual key value from our column name
+                                    const key_val_for_customer_properties:string = columMap.get(column)!
+                                    return (<td key={`${dataItem.customer_id}-${column}`} className=" max-w-0.5 px-4 py-2 border text-sm font-light overflow-x-auto whitespace-nowrap" >
+                                        {dataItem[key_val_for_customer_properties]}
                                     </td>)
                                 })}
                             </tr>)

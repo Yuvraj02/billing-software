@@ -1,10 +1,9 @@
-import Customers from "../components/customers/Customers"
-import Navbar from "../components/Navbar"
+import Customers from "../components/all_customers/Customers"
+
 
 function Home (){
 
     return (<>
-        <Navbar/>
         <Customers/>
     </>)
 }
