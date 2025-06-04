@@ -2,7 +2,6 @@ import { useState } from "react"
 import SearchBar from "../../../components/common/SearchBar"
 import AddCustomerModal from "../add_customer/AddCustomerModal";
 import type { CustomerModel } from "../../../models/CustomerModel";
-import { useAppSelector } from "../../../hooks";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCustomers, type CustomerApiResponse } from "../api";
 
