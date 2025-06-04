@@ -1,9 +1,9 @@
-import type { CategoryModel } from "../../models/CategoryModel"
+import type { CategoryModel } from "../../../models/CategoryModel"
 import DimensionTable from "./DimensionTable"
-import DropDownMenu from "../DropdownMenu"
+import DropDownMenu from "../../../components/common/DropdownMenu"
 import { useState } from "react"
 // import { useAppDispatch } from "../../hooks"
-import { useAppSelector } from "../../hooks"
+import { useAppSelector } from "../../../hooks"
 //As soon as user click's Select Category Algorithim will execute as follows
 /*
     1. All Categories will be fetched in map with there name as key and value as the model itself 
@@ -17,12 +17,12 @@ function AddCustomerForm() {
     const [trigger, setTrigger] = useState<boolean>(false)
     const [buttonText, setButtonText] = useState<string>("Select Category")
     //const categories: string[] = ["--Select Category--", "Kurta", "Salvaar"]
-    const categories = useAppSelector((state)=>state.categories.categories)
-    
+    const categories = useAppSelector((state) => state.categories.categories)
+
     const [categoryModel, setCategory] = useState<CategoryModel>({} as CategoryModel)
 
 
-    const handleOnDropDownClick = (categoryModel : CategoryModel) => {
+    const handleOnDropDownClick = (categoryModel: CategoryModel) => {
         const text: string = categoryModel.category_name
         setButtonText(text)
         setTrigger(false)

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { MdMenu } from "react-icons/md";
 import { MdArrowBack } from "react-icons/md";
-import sanjhikala_logo from '../assets/sanjhikala_logo.jpg'
+import sanjhikala_logo from '../../assets/sanjhikala_logo.jpg'
 import { MdOutlineAccountCircle } from "react-icons/md";
-import { useAppSelector } from "../hooks";
+import { useAppSelector } from "../../hooks";
 import DropDownMenu from "./DropdownMenu";
 import { NavLink } from "react-router";
 

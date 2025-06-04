@@ -1,5 +1,5 @@
 
-import type { CategoryModel } from "../../models/CategoryModel"
+import type { CategoryModel } from "../../../models/CategoryModel"
 
 function DimensionTable({ categoryModel }: { categoryModel?: CategoryModel }) {
 

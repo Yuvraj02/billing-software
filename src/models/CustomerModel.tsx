@@ -1,7 +1,7 @@
 export interface CustomerModel {
     customer_id:number
-    name:string
-    email?:string
-    phone:string
+    customer_name:string
+    customer_email?:string
+    customer_ph:string
     [key:string] : string | number | undefined
 }

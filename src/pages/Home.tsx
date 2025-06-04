@@ -1,10 +1,10 @@
-import Customers from "../components/all_customers/Customers"
+import Customers from "../features/customers/all_customers/Customers"
 
 
-function Home (){
+function Home() {
 
     return (<>
-        <Customers/>
+        <Customers />
     </>)
 }
 

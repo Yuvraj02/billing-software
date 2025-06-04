@@ -1,5 +1,5 @@
 import { MdClose } from "react-icons/md"
-import sanjhikala_logo from "../../assets/sanjhikala_logo.jpg"
+import sanjhikala_logo from "../../../assets/sanjhikala_logo.jpg"
 import AddCustomerForm from "./AddCustomerForm"
 interface ModalProp {
     isOpen: boolean,

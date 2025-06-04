@@ -8,7 +8,7 @@ const initialState = {
       category_id: 0,
       category_name: "Kurta",
       length: "Length",
-      upper_neck: "Upper Neck",
+      upper_neck: "Neck Front",
       upper_chest: "Upper Chest",
       chest: "Chest",
       waist: "Waist",

@@ -1,22 +1,48 @@
 import { useState } from "react"
-import SearchBar from "../SearchBar"
+import SearchBar from "../../../components/common/SearchBar"
 import AddCustomerModal from "../add_customer/AddCustomerModal";
-import type { CustomerModel } from "../../models/CustomerModel";
-import { useAppSelector } from "../../hooks";
+import type { CustomerModel } from "../../../models/CustomerModel";
+import { useAppSelector } from "../../../hooks";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCustomers, type CustomerApiResponse } from "../api";
+
 
 function CustomerTable() {
 
     //Hooks Related to table
     const [isOpenModal, setOpen] = useState<boolean>(false)
-    const tableColumns:string[] = ["ID", "Name", "Email", "Phone"]
+    const tableColumns: string[] = ["ID", "Name", "Email", "Phone"]
+    
+    //These will map column names with their corresponding model names
+    //This will be useful when we render data according to the table head
     const columMap = new Map<string, string>([
         ["ID", "customer_id"],
-        ["Name", "name"],
-        ["Email", "email"],
-        ["Phone", "phone"]
+        ["Name", "customer_name"],
+        ["Email", "customer_email"],
+        ["Phone", "customer_ph"]
     ])
-    
-      const data = useAppSelector((state) => state.customers.customersData);
+
+    //    const customer_data: CustomerModel[] = useAppSelector((state) => state.customers.customersData);
+
+    const query = useQuery<CustomerApiResponse, Error>({
+        queryKey: ['customers'],
+        queryFn: fetchCustomers
+    })
+    console.log(query.data?.data)
+
+    if (query.isLoading) {
+        return <div>Loading Customers</div>
+    }
+
+    if (query.isError) {
+        return <div>Error Loading Data</div>
+    }
+
+    if(query.data?.data==null){
+        return <div>No Customers Found</div>
+    }
+
+    const customer_data = query.data.data
 
     return (<>
         <div className="m-25  p-6 border rounded-2xl max-h-48 md:max-h-96 lg:max-h-100 overflow-y-auto">
@@ -31,8 +57,8 @@ function CustomerTable() {
                     </div>
 
                     {/* <BillModal isOpen={isOpenModal} onClose={()=>setOpen(false)} /> */}
-                    
-                    <AddCustomerModal isOpen = {isOpenModal} onClose={()=>setOpen(false)}/>
+
+                    <AddCustomerModal isOpen={isOpenModal} onClose={() => setOpen(false)} />
                 </div>
                 <div className="flex gap-3">
                     <button onClick={() => setOpen(true)} className="border text-center rounded-2xl px-2 cursor-pointer hover:bg-[#f69400] hover:text-amber-50">Add Customer</button>
@@ -50,12 +76,12 @@ function CustomerTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((dataItem:CustomerModel) => {
+                        {customer_data.map((dataItem: CustomerModel) => {
                             return (<tr key={dataItem.customer_id} className="space hover:bg-gray-800">
                                 {tableColumns.map((column) => {
-                                    
+
                                     //Here we will get actual key value from our column name
-                                    const key_val_for_customer_properties:string = columMap.get(column)!
+                                    const key_val_for_customer_properties: string = columMap.get(column)!
                                     return (<td key={`${dataItem.customer_id}-${column}`} className=" max-w-0.5 px-4 py-2 border text-sm font-light overflow-x-auto whitespace-nowrap" >
                                         {dataItem[key_val_for_customer_properties]}
                                     </td>)
