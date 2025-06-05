@@ -3,8 +3,7 @@ import SearchBar from "../../../components/common/SearchBar"
 import AddCustomerModal from "../add_customer/AddCustomerModal";
 import type { CustomerModel } from "../../../models/CustomerModel";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCustomers, type CustomerApiResponse } from "../api";
-
+import { fetchCustomers, type CustomersApiResponse } from "../api";
 
 function CustomerTable() {
 
@@ -23,18 +22,17 @@ function CustomerTable() {
 
     //    const customer_data: CustomerModel[] = useAppSelector((state) => state.customers.customersData);
 
-    const query = useQuery<CustomerApiResponse, Error>({
+    const query = useQuery<CustomersApiResponse, Error>({
         queryKey: ['customers'],
         queryFn: fetchCustomers
     })
-    console.log(query.data?.data)
 
     if (query.isLoading) {
         return <div>Loading Customers</div>
     }
 
     if (query.isError) {
-        return <div>Error Loading Data</div>
+        return <div className="text-white">Error Loading Data</div>
     }
 
     if(query.data?.data==null){
@@ -42,6 +40,8 @@ function CustomerTable() {
     }
 
     const customer_data = query.data.data
+
+    
 
     return (<>
         <div className="m-25  p-6 border rounded-2xl max-h-48 md:max-h-96 lg:max-h-100 overflow-y-auto">
