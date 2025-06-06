@@ -28,6 +28,16 @@ export interface CategoryApiResponse {
     category_data ? : CategoryModel[]
 }
 
+export interface AddCustomerApiResponse{
+    status:string
+    data_added?:CustomerModel
+}
+
+export interface UpdateDimensionsAPI{
+    id:number
+    data : DimensionModel
+}
+
 const API_BASE_URL : string = 'http://localhost:3000'
 
 //API Request to get all customers
@@ -48,7 +58,22 @@ export async function fetchCategory(){
     return response.data
 }
 
+//API Request to get customers by phone
 export async function fetchCustomerByPhone(phone:string){
     const response = await axios.get(`${API_BASE_URL}/customers/${phone}`)
     return response.data
+}
+
+export async function addCustomers(customer:CustomerModel){
+    const response = await axios.post(`${API_BASE_URL}/add_customer`, customer)
+    return response.data
+}
+
+export async function addDimensions(dimensions : DimensionModel){
+    await axios.post(`${API_BASE_URL}/add_dim`, dimensions)
+}
+
+//TODO
+export async function updateDimensions(dimensions:UpdateDimensionsAPI){
+    await axios.patch(`${API_BASE_URL}/update_dim/${dimensions.id}`,dimensions.data)
 }

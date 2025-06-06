@@ -1,11 +1,12 @@
 import { MdClose } from "react-icons/md"
 import sanjhikala_logo from "../../../assets/sanjhikala_logo.jpg"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { CategoryModel } from "../../../models/CategoryModel"
 import DropDownMenu from "../../../components/common/DropdownMenu"
-import { useQuery } from "@tanstack/react-query"
-import { fetchCategory, fetchCustomerByPhone, type CategoryApiResponse } from "../api"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { addCustomers, addDimensions, fetchCategory, fetchCustomerByPhone, updateDimensions, type AddCustomerApiResponse, type CategoryApiResponse, type CustomerApiResponse, type UpdateDimensionsAPI } from "../api"
 import type { CustomerModel } from "../../../models/CustomerModel"
+import type { DimensionModel } from "../../../models/DimensionModel"
 interface ModalProp {
     isOpen: boolean,
     onClose: () => void
@@ -16,14 +17,10 @@ function AddCustomerModal(prop: ModalProp) {
     const [dropDowntrigger, setTrigger] = useState<boolean>(false)
     const [buttonText, setButtonText] = useState<string>("Select Category")
 
-    // const categories = useAppSelector((state) => state.categories.categories)
-
     const [categoryModel, setCategory] = useState<CategoryModel>({} as CategoryModel)
-    const [customer_phone, setPhoneState] = useState<string>('')
-    const [customer_name, setName] = useState<string>('')
+    const [customerPhone, setPhoneState] = useState<string>('')
+    const [customerName, setName] = useState<string>('')
     const [shouldFetchCustomer, setShouldFetch] = useState<boolean>(false)
-    
-
     const handleOnDropDownClick = (categoryModel: CategoryModel) => {
         const text: string = categoryModel.category_name
         setButtonText(text)
@@ -39,38 +36,85 @@ function AddCustomerModal(prop: ModalProp) {
         queryFn: fetchCategory
     })
 
+    const customerQuery = useQuery<CustomerApiResponse, Error>({
+        queryKey: ['customerByPhone', customerPhone],
+        queryFn: () => fetchCustomerByPhone(customerPhone),
+        enabled: shouldFetchCustomer && customerPhone.length === 10
+    })
+
+    const addCustomer = useMutation({
+        mutationFn: (customerModel: CustomerModel) => addCustomers(customerModel),
+        //First arguement is the data[payload] that we are posting to our servers, second arguement is the data/or arguement from the place where this function will be called
+        //But here we are using just one arguement rn
+        onSuccess: (newCustomerData: AddCustomerApiResponse) => {
+            // console.log(`Data ADDED : ${newCustomerData.data_added?.customer_name}`)
+            //Now set dimensions for the new customer
+            const newCustomer = newCustomerData.data_added
+            // const updatedDimensionValues = (prevDim:DimensionModel) => ({ ...prevDim, customer_id: newCustomer?.customer_id, customer_name: newCustomer?.customer_name, customer_phone: newCustomer?.customer_ph })
+            const newCustomerDimension: DimensionModel = {
+                ...dimensions,
+                customer_id: newCustomer?.customer_id,
+                customer_name: newCustomer?.customer_name,
+                customer_phone: newCustomer?.customer_ph
+            }
+
+            setDimensions(newCustomerDimension)
+            // setDimensions((prevDim) => ({ ...prevDim, customer_id: newCustomer?.customer_id, customer_name: newCustomer?.customer_name, customer_phone: newCustomer?.customer_ph }))
+            addDimensionMutation.mutate(newCustomerDimension)
+        }
+    })
+
+    const addDimensionMutation = useMutation({
+        mutationKey:['addCustomerDimensions'],
+        mutationFn: (dimensionData: DimensionModel) => addDimensions(dimensionData)
+    })
+
+   const updateDimensionMutations = useMutation({
+    mutationKey:['updateCustomerDimension'],
+    mutationFn: (dimensions:UpdateDimensionsAPI) => updateDimensions(dimensions)
+   })
+
     let categories: CategoryModel[] = [{ category_id: -1, category_name: "None" } as CategoryModel]
-
     const api_data: CategoryModel[] | undefined = query.data?.category_data
-
     if (api_data != null) {
         categories = [...categories, ...api_data!]
     }
 
-     const customerQuery = useQuery({
-        queryKey: ['customer'],
-        queryFn:()=> fetchCustomerByPhone(customer_phone),
-        enabled:shouldFetchCustomer && customer_phone.length===10
-    })
+    const [dimensions, setDimensions] = useState<DimensionModel>({})
 
-
-    const onAddCustomerHandler = () => {
-        //Fetch customer by phone first
-    
-        setShouldFetch(true)
-        // const customerData : CustomerModel[] : undefined = customerQuery.data
-        if(customerQuery.data==null){
-            //Add New customer to the database
-            const customerData : CustomerModel = {
-                customer_name : customer_name,
-                customer_ph : customer_phone,
-            }
-
-        //POST Request to create new customer and there dimensions
-        }
-
+    const onDimensionChangeHandler = (e: React.ChangeEvent<HTMLInputElement>, dimension_key: string | number) => {
+        const parsedSize: number = Number(e.target.value)
+        setDimensions((prevDimensionState) => ({ ...prevDimensionState, [dimension_key]: parsedSize }))
     }
 
+    //This will trigger when shouldFetchCustomer is switched from false to true
+    useEffect(() => {
+
+        if (!customerQuery.isLoading && customerQuery.isFetched) {
+            //Now this contains our customerModel
+            if (customerQuery.data != null) { //This means there is an existing customer
+                const customerData: CustomerModel = customerQuery.data.searched_data
+                setDimensions((prevDimensions) => ({ ...prevDimensions, customer_id: customerData.customer_id, customer_name: customerData.customer_name, customer_phone: customerData.customer_ph }))
+                //DO NOT CONSOLE LOG DIEMNSIONS HERE BECAUSE IT WILL RESULT IN LOGGING PREVIOUS STATE USE ANOTHER USE EFFECT INSTEAD 
+                updateDimensionMutations.mutate({data:dimensions,id:dimensions.customer_id!})
+            } else {
+                //Add new customer and Dimensions
+                const newCustomer: CustomerModel = { customer_name: customerName, customer_ph: customerPhone }
+                //New dimensions will be added onSuccess of useMutation
+                addCustomer.mutate(newCustomer)
+            }
+        }
+        setShouldFetch(false)
+    }, [customerQuery.data, shouldFetchCustomer, customerQuery.isLoading, customerQuery.isFetched])
+
+    useEffect(() => {
+        console.log(dimensions)
+    }, [dimensions])
+
+    //This will fire up as soon as add customer will be clicked
+    const onAddCustomerHandler = () => {
+         setShouldFetch(true)
+    }
     return (<>
         <div className={`fixed inset-0 flex justify-center items-center transition-colors
             ${prop.isOpen ? "visible bg-black/50" : "invisible"}
@@ -110,8 +154,8 @@ function AddCustomerModal(prop: ModalProp) {
                             {Object.entries(categoryModel!).map(([key, value]) => {
                                 if (key == "category_id" || key == "category_name") return (null)
                                 return (<>
-                                    <div className="border p-2">{value}</div>
-                                    <div><input type="number" className="border p-2 w-3/12" placeholder="0.0" /></div>
+                                    <div key={1 + key} className="border p-2">{value}</div>
+                                    <div><input onChange={(e) => onDimensionChangeHandler(e, key)} type="number" className="border p-2 w-3/12" placeholder="0.0" /></div>
                                 </>)
                             })}
                         </div>
