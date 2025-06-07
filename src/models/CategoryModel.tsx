@@ -1,6 +1,6 @@
 export interface CategoryModel{
-    category_id:number,
-    category_name:string,
+    category_id?:number,
+    category_name?:string,
     // length?: number
     // shoulder?: number
     // upper_chest?: number
@@ -11,6 +11,6 @@ export interface CategoryModel{
     // neck_back?: number
     // armhole?: number
     // bottom?: number
-    [key:string] : string | number
+    [key:string] : string | number | undefined
    
 }

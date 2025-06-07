@@ -2,7 +2,6 @@ import { useState } from "react";
 import { MdMenu } from "react-icons/md";
 import { MdArrowBack } from "react-icons/md";
 import sanjhikala_logo from '../../assets/sanjhikala_logo.jpg'
-import { MdOutlineAccountCircle } from "react-icons/md";
 import { useAppSelector } from "../../hooks";
 import DropDownMenu from "./DropdownMenu";
 import { NavLink } from "react-router";
@@ -43,9 +42,7 @@ function Navbar() {
       <div className="p-2 absolute left-1/2 -translate-x-1/2">
         <img src={sanjhikala_logo} className="h-25" alt="Sanjhikala Logo" />
       </div>
-      <div className="p-2 m-9">
-        <MdOutlineAccountCircle className="text-3xl font-light" />
-      </div>
+    
     </div>
   </>)
 
@@ -62,11 +59,12 @@ function ExtendedNavBar({ handleShrinkNav }: { handleShrinkNav: () => void }) {
     <div className="w-full  flex justify-end p-2 "><MdArrowBack onClick={handleShrinkNav} className="m-2 text-2xl cursor-pointer" /></div>
     <div className="my-2">
       <ul className="my-3 text-center" >
-        <NavLink to={"/"}><li className="border-t p-2 cursor-pointer hover:bg-neutral-900">Home</li></NavLink>
-        <NavLink to={"/add_category"}><li className="border-t p-2 cursor-pointer hover:bg-neutral-900">Add Category</li></NavLink>
-        <li className="">
-          <div className="relative"><DropDownMenu className="border-t p-2 cursor-pointer hover:bg-neutral-900" buttonText="Categories" setTrigger={setTrigger} trigger={trigger}>
-            {categories.map((value, index) => { if (value.category_name == "None") { return (<></>) } return (<div className="p-2 cursor-pointer hover:bg-neutral-800" key={index}>{value.category_name}</div>) })}
+        <NavLink to={"/"} onClick={handleShrinkNav}><li key={'li_item1'} className="border-t p-2 cursor-pointer hover:bg-neutral-900">Home</li></NavLink>
+        <NavLink to={"/add_category"} onClick={handleShrinkNav}><li key={'li_item2'} className="border-t p-2 cursor-pointer hover:bg-neutral-900">Add Category</li></NavLink>
+        <NavLink to={"/all_customers"}><li className="border-t p-2 cursor-pointer hover:bg-neutral-900" key={'li_item3'}>All Customers</li></NavLink>
+        <li key={'li_item4'} className="">
+          <div key = {'li_item5'} className="relative"><DropDownMenu className="border-t p-2 cursor-pointer hover:bg-neutral-900" buttonText="Categories" setTrigger={setTrigger} trigger={trigger}>
+            {categories.map((value, index) => { if (value.category_name == "None") { return (<div key={5173}></div>) } return (<div className="p-2 cursor-pointer hover:bg-neutral-800" key={index}>{value.category_name}</div>) })}
           </DropDownMenu></div></li>
       </ul>
     </div>

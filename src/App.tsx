@@ -10,6 +10,7 @@ import AppLayout from "./pages/AppLayout"
 import AddCategory from "./pages/AddCategory"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import Customers from "./features/customers/all_customers/Customers"
 
 const router = createBrowserRouter([
     {
@@ -24,6 +25,14 @@ const router = createBrowserRouter([
           path: "/add_category",
           element: <AddCategory />
         },
+        {
+          path:"/all_customers",
+          element:<Customers/>
+        }
+        // {
+        //   path: "/work_details/:id",
+        //   element:<CustomerProfileModal/>
+        // }
       ]
     }
   ])

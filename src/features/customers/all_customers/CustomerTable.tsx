@@ -1,23 +1,23 @@
 import { useState } from "react"
 import SearchBar from "../../../components/common/SearchBar"
-import AddCustomerModal from "../add_customer/AddCustomerModal";
+import AddCustomerModal from "../../orders/add_customer/AddCustomerModal";
 import type { CustomerModel } from "../../../models/CustomerModel";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCustomers, type CustomersApiResponse } from "../api";
+import { fetchCustomers, type CustomersApiResponse } from "../../orders/api";
 
 function CustomerTable() {
 
     //Hooks Related to table
     const [isOpenModal, setOpen] = useState<boolean>(false)
     const tableColumns: string[] = ["ID", "Name", "Email", "Phone"]
-    
+
     //These will map column names with their corresponding model names
     //This will be useful when we render data according to the table head
     const columMap = new Map<string, string>([
         ["ID", "customer_id"],
         ["Name", "customer_name"],
         ["Email", "customer_email"],
-        ["Phone", "customer_ph"]
+        ["Phone", "customer_ph"],
     ])
 
     //    const customer_data: CustomerModel[] = useAppSelector((state) => state.customers.customersData);
@@ -28,29 +28,24 @@ function CustomerTable() {
     })
 
     if (query.isLoading) {
-        return <div>Loading Customers</div>
+        return <div className="h-screen w-screen flex justify-center items-center">Loading Customers Data...</div>
     }
 
     if (query.isError) {
-        return <div className="text-white">Error Loading Data</div>
+        return <div className="h-screen w-screen flex justify-center items-center">Error Loading Data</div>
     }
 
-    if(query.data?.data==null){
+    if (query.data?.data == null) {
         return <div>No Customers Found</div>
     }
 
     const customer_data = query.data.data
-
-    
 
     return (<>
         <div className="m-25  p-6 border rounded-2xl max-h-48 md:max-h-96 lg:max-h-100 overflow-y-auto">
             <div className="flex justify-between">
                 <div className="flex">
                     <h1 className="font-bold">All Customers</h1>
-                    <div className="items-center ml-8">
-                        <SearchBar title="Name" />
-                    </div>
                     <div className="items-center ml-2">
                         <SearchBar title="Phone No." />
                     </div>
@@ -58,11 +53,6 @@ function CustomerTable() {
                     {/* <BillModal isOpen={isOpenModal} onClose={()=>setOpen(false)} /> */}
 
                     <AddCustomerModal isOpen={isOpenModal} onClose={() => setOpen(false)} />
-                </div>
-                <div className="flex gap-3">
-                    <button onClick={() => setOpen(true)} className="border text-center rounded-2xl px-2 cursor-pointer hover:bg-[#f69400] hover:text-amber-50">Add Customer</button>
-                    <button className="border text-center rounded-2xl px-2 cursor-pointer hover:bg-[#f69400] hover:text-amber-50">Generate Bill</button>
-                    {/* <MdAdd className="text-3xl mt-1.5" /> */}
                 </div>
             </div>
             <div className="max-w-5xl py-7 overflow-x-auto">

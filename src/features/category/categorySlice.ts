@@ -6,7 +6,7 @@ const initialState = {
     { category_id: -1, category_name: "None" },
     {
       category_id: 0,
-      category_name: "Kurta",
+      category_name: "DUMMY1",
       length: "Length",
       upper_neck: "Neck Front",
       upper_chest: "Upper Chest",
@@ -17,7 +17,7 @@ const initialState = {
 
     {
       category_id: 0,
-      category_name: "Salvaar",
+      category_name: "DUMMY 2",
       length: "Length",
       botom: "Bottom",
     },

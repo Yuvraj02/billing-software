@@ -1,9 +1,10 @@
-import Customers from "../features/customers/all_customers/Customers"
+// import Customers from "../features/customers/all_customers/Customers"
 
+import PendingWork from "../features/orders/work/PendingWork"
 
 function Home() {
     return (<>
-        <Customers />
+        <PendingWork />
     </>)
 }
 

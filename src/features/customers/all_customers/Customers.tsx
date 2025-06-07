@@ -1,11 +1,11 @@
 import CustomerTable from "./CustomerTable"
 
-function Customers(){
+function Customers() {
 
     return (<>
-    <div className="m-4 ">
-        <CustomerTable/>
-    </div>
+        <div className="m-4 ">
+            <CustomerTable/>
+        </div>
     </>)
 }
 

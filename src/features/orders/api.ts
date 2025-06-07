@@ -1,7 +1,10 @@
+//TODO : CHANGE APIs ACCORDING TO THE NEW WORK ROUTE 
+
 import axios from "axios";
 import type { CustomerModel } from "../../models/CustomerModel";
 import type { DimensionModel } from "../../models/DimensionModel";
 import type { CategoryModel } from "../../models/CategoryModel";
+import type { WorkModel } from "../../models/WorkModel";
 // import type { CustomerModel } from "../../models/CustomerModel";
 
 //This interface model will store the result of all the customers
@@ -73,7 +76,11 @@ export async function addDimensions(dimensions : DimensionModel){
     await axios.post(`${API_BASE_URL}/add_dim`, dimensions)
 }
 
-//TODO
 export async function updateDimensions(dimensions:UpdateDimensionsAPI){
     await axios.patch(`${API_BASE_URL}/update_dim/${dimensions.id}`,dimensions.data)
+}
+
+export async function addWork(workData:WorkModel) : Promise<WorkModel> {
+    const response = await axios.post(`${API_BASE_URL}/add_work`, workData)
+    return response.data
 }
