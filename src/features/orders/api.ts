@@ -41,6 +41,22 @@ export interface UpdateDimensionsAPI{
     data : DimensionModel
 }
 
+export interface PendingWorkAPIResponse{
+    status:string
+    count:number
+    data?: WorkModel[]
+}
+
+export interface SearchWorkAPIResponse {
+    status : string
+    data? : WorkModel[]
+}
+
+export interface CustomerDetailsFromWorkAPIResponse{
+    statis:string
+    data?:WorkModel
+}
+
 const API_BASE_URL : string = 'http://localhost:3000'
 
 //API Request to get all customers
@@ -82,5 +98,20 @@ export async function updateDimensions(dimensions:UpdateDimensionsAPI){
 
 export async function addWork(workData:WorkModel) : Promise<WorkModel> {
     const response = await axios.post(`${API_BASE_URL}/add_work`, workData)
+    return response.data
+}
+
+export async function getPendingWork() : Promise<PendingWorkAPIResponse>{
+    const response = await axios.get(`${API_BASE_URL}/work_list`)
+    return response.data
+}
+
+export async function searchPendingWork(phone : string) : Promise<SearchWorkAPIResponse>{
+    const response = await axios.get(`${API_BASE_URL}/work_list/${phone}`)
+    return response.data
+}
+
+export async function getPendingWorkDetailsById(id:string) : Promise<CustomerDetailsFromWorkAPIResponse>{
+    const response = await axios.get(`${API_BASE_URL}/work_list/customer/${id}`)
     return response.data
 }

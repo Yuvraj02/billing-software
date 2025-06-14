@@ -1,32 +1,18 @@
 import { MdClose } from "react-icons/md"
 import sanjhikala_logo from "../../../assets/sanjhikala_logo.jpg"
-import { useAppSelector } from "../../../hooks"
 import { MdDoneOutline } from "react-icons/md";
-import { useEffect, useState } from "react";
 import type { WorkModel } from "../../../models/WorkModel";
+
 
 interface CustomerModal {
     isOpen: boolean
     onClose: () => void
-    id: string //This is customer id
+    workModel:WorkModel
 }
 
-function CustomerProfileModal(prop: CustomerModal) {
+function WorkDetailsModal(prop: CustomerModal) {
 
-    const customerData: WorkModel[] = useAppSelector((state) => state.work.work_left)
-
-    const [singleCustomerData, setCustomerData] = useState<WorkModel>({ work_id: '1', date: new Date(Date.now()), work_status: "Pending" })
-
-    useEffect(() => {
-
-        if (prop.isOpen && prop.id) {  
-            customerData.forEach((workModel) => {
-                if (workModel.work_id === prop.id) {
-                    setCustomerData(workModel)
-                }
-            })
-        }
-    },)
+    const customer_data = prop.workModel
 
     const columnMap = new Map<string, string>([
         ["length", "Length"],
@@ -60,21 +46,21 @@ function CustomerProfileModal(prop: CustomerModal) {
                 <div className="grid grid-cols-[auto_1fr] gap-2 w-fit">
 
                     <div><h1>Phone (+91): </h1></div>
-                    <div>{singleCustomerData.customer_phone} </div>
+                    <div>{customer_data.customer_phone} </div>
 
                     <div><h1>Name: </h1></div>
-                    <div>{singleCustomerData.customer_name} </div>
+                    <div>{customer_data.customer_name} </div>
                     <div className="">Category : </div>
-                    <div className="">{singleCustomerData.category_name?.toString()}</div>
+                    <div className="">{customer_data.category?.toString()}</div>
                      <div className="">Date : </div>
-                    <div className="">{singleCustomerData.date?.toString()}</div>
+                    <div className="">{customer_data.date?.toString()}</div>
                 </div>
                 
                 {/* Render Dimensions Table according to the Customer */}
-                <div className="py-4">Sizes Given By Customer For {singleCustomerData.category_name?.toString()} </div>
+                <div className="py-4">Sizes Given By Customer For {customer_data.category?.toString()} </div>
                 <div className="grid grid-cols-[auto_1fr] overflow-y-auto w-fit ">
-                    {Object.entries(singleCustomerData).map(([key, value]) => {
-                        if (key == "customer_id" || key == "customer_name" || key == "customer_phone" || key == "work_id" || key == "work_status" || key == "date" || key=="category_name") return (null)
+                    {Object.entries(customer_data).map(([key, value]) => {
+                        if (key == "customer_id" || key == "customer_name" || key == "customer_phone" || key == "work_id" || key == "work_status" || key == "date" || key=="category" || key=="customer_email") return (null)
                         const columnName = columnMap.get(key)
                         return (<>
                             <div key={key + 1} className="border p-2">{columnName}</div>
@@ -91,4 +77,4 @@ function CustomerProfileModal(prop: CustomerModal) {
     </div>)
 }
 
-export default CustomerProfileModal
+export default WorkDetailsModal
