@@ -1,9 +1,9 @@
 import { MdClose } from "react-icons/md"
 import sanjhikala_logo from "../../../assets/sanjhikala_logo.jpg"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import type { CategoryModel } from "../../../models/CategoryModel"
 import DropDownMenu from "../../../components/common/DropdownMenu"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { addCustomers, addDimensions, addWork, fetchCategory, fetchCustomerByPhone, updateDimensions, type AddCustomerApiResponse, type CategoryApiResponse, type CustomerApiResponse, type UpdateDimensionsAPI } from "../api"
 import type { CustomerModel } from "../../../models/CustomerModel"
 import type { DimensionModel } from "../../../models/DimensionModel"
@@ -12,6 +12,7 @@ import {v1 as uuidv1} from "uuid"
 interface ModalProp {
     isOpen: boolean,
     onClose: () => void
+    openModal : React.Dispatch<React.SetStateAction<boolean>> 
 }
 
 function AddCustomerModal(prop: ModalProp) {
@@ -19,7 +20,6 @@ function AddCustomerModal(prop: ModalProp) {
     const [dropDowntrigger, setTrigger] = useState<boolean>(false)
     const [buttonText, setButtonText] = useState<string>("Select Category")
     const [categoryModel, setCategory] = useState<CategoryModel>({} as CategoryModel)
-    const [workModel,setWork] = useState<WorkModel>({} as WorkModel)
     const [customerPhone, setPhoneState] = useState<string>('')
     const [customerName, setName] = useState<string>('')
     const [shouldFetchCustomer, setShouldFetch] = useState<boolean>(false)
@@ -33,6 +33,8 @@ function AddCustomerModal(prop: ModalProp) {
 
     const onPhoneChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => setPhoneState(e.target.value)
     const onNameChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)
+    
+    const queryClient = useQueryClient()
 
     const query = useQuery<CategoryApiResponse, Error>({
         queryKey: ['category'],
@@ -49,7 +51,7 @@ function AddCustomerModal(prop: ModalProp) {
         mutationFn: (customerModel: CustomerModel) => addCustomers(customerModel),
         //First arguement is the data[payload] that we are posting to our servers, second arguement is the data/or arguement from the place where this function will be called
         //But here we are using just one arguement rn
-        onSuccess: (newCustomerData: AddCustomerApiResponse) => {
+        onSuccess: (newCustomerData: AddCustomerApiResponse) => {            
             //Now set dimensions for the new customer
             const newCustomer = newCustomerData.data_added
             
@@ -60,30 +62,31 @@ function AddCustomerModal(prop: ModalProp) {
                 customer_name: newCustomer?.customer_name,
                 customer_phone: newCustomer?.customer_ph
             }
+                
             //Set Dimensions
             setDimensions(newCustomerDimension)
             //Send back to the server
+            console.log(newCustomerDimension)
+
             addDimensionMutation.mutate(newCustomerDimension)
 
             //Update New Work Status and Data and send back to the server
             const newWorkModel : WorkModel = {
                 work_id:uuidv1(),
-                customer_id:newCustomer?.customer_id,
-                customer_name:newCustomer?.customer_name,
-                customer_email:newCustomer?.customer_email,
-                customer_phone:newCustomer?.customer_ph,
                 work_status:"Pending",
-                date: new Date(Date.now())
+                date: new Date(Date.now()),
+                category:categoryModel.category_name,
+                ...newCustomerDimension
             }
             
-            setWork(newWorkModel)
-            addWorkMutation.mutate(workModel)
+            // console.log(newWorkModel.work_id)
+            addWorkMutation.mutate(newWorkModel)
         }
     })
 
     const addDimensionMutation = useMutation({
         mutationKey: ['addCustomerDimensions'],
-        mutationFn: (dimensionData: DimensionModel) => addDimensions(dimensionData)
+        mutationFn: (dimensionData: DimensionModel) => addDimensions(dimensionData),
     })
 
     const updateDimensionMutations = useMutation({
@@ -93,7 +96,11 @@ function AddCustomerModal(prop: ModalProp) {
 
     const addWorkMutation = useMutation({
         mutationKey:['addNewWork'],
-        mutationFn:(workData: WorkModel) => addWork(workData)
+        mutationFn:(workData: WorkModel) => addWork(workData),
+        onSuccess:()=>{
+            queryClient.invalidateQueries({queryKey:['pending_work']})
+            prop.openModal(false)
+        }
     })
 
 
@@ -112,27 +119,35 @@ function AddCustomerModal(prop: ModalProp) {
 
     //This will trigger when shouldFetchCustomer is switched from false to true
     useEffect(() => {
-
+        
         if (!customerQuery.isLoading && customerQuery.isFetched) {
             //Now this contains our customerModel
             //This means there is an existing customer
             if (customerQuery.data != null) { 
                 const customerData: CustomerModel = customerQuery.data.searched_data
-                setDimensions((prevDimensions) => ({ ...prevDimensions, customer_id: customerData.customer_id, customer_name: customerData.customer_name, customer_phone: customerData.customer_ph }))
+                
+                // setDimensions((prevDimensions) => ({ ...prevDimensions, customer_id: customerData.customer_id, customer_name: customerData.customer_name, customer_phone: customerData.customer_ph }))
+                // console.log(customerData.customer_id)
+                const updatedDimensions : DimensionModel = {
+                    customer_id : customerData.customer_id,
+                    customer_name:customerData.customer_name,
+                    customer_phone:customerData.customer_ph,
+                    ...dimensions
+                }
+                console.log(updatedDimensions)
                 //DO NOT CONSOLE LOG DIEMNSIONS HERE BECAUSE IT WILL RESULT IN LOGGING PREVIOUS STATE USE ANOTHER USE EFFECT INSTEAD 
-                updateDimensionMutations.mutate({ data: dimensions, id: dimensions.customer_id! })
+                updateDimensionMutations.mutate({ data: updatedDimensions, id: updatedDimensions.customer_id! })
                 
                 //In case of existing customer, simply create new work model here after retrieval od the customer
                 const newWorkModel : WorkModel = {
                     work_id: uuidv1(),
-                    customer_id:customerData.customer_id,
-                    customer_email:customerData.customer_email,
-                    customer_phone:customerData.customer_ph,
                     work_status:"Pending",
-                    date:new Date(Date.now())
+                    date:new Date(Date.now()),
+                    category:categoryModel.category_name,
+                    ...updatedDimensions
                 }
-                setWork(newWorkModel)
-                addWorkMutation.mutate(workModel)
+
+                addWorkMutation.mutate(newWorkModel)
             } else {
                 //Add new customer and Dimensions
                 const newCustomer: CustomerModel = { customer_name: customerName, customer_ph: customerPhone }
@@ -140,6 +155,7 @@ function AddCustomerModal(prop: ModalProp) {
                 addCustomer.mutate(newCustomer)
             }
         }
+       
         setShouldFetch(false)
     }, [customerQuery.data, shouldFetchCustomer, customerQuery.isLoading, customerQuery.isFetched])
 
@@ -150,7 +166,9 @@ function AddCustomerModal(prop: ModalProp) {
     //This will fire up as soon as add customer will be clicked
     const onAddCustomerHandler = () => {
         setShouldFetch(true)
+        
     }
+
     return (<>
         <div className={`fixed inset-0 flex justify-center items-center transition-colors
             ${prop.isOpen ? "visible bg-black/50" : "invisible"}
@@ -191,7 +209,7 @@ function AddCustomerModal(prop: ModalProp) {
                                 if (key == "category_id" || key == "category_name") return (null)
                                 return (<>
                                     <div key={1 + key} className="border p-2">{value}</div>
-                                    <div><input onChange={(e) => onDimensionChangeHandler(e, key)} type="number" className="border p-2 w-3/12" placeholder="0.0" /></div>
+                                    <div key={value}><input onChange={(e) => onDimensionChangeHandler(e, key)} type="number" className="border p-2 w-3/12" placeholder="0.0" /></div>
                                 </>)
                             })}
                         </div>
@@ -199,7 +217,7 @@ function AddCustomerModal(prop: ModalProp) {
                     </div>
                 </div>
                 <div className="flex justify-end">
-                    <div onClick={onAddCustomerHandler} className="border rounded-2xl p-2 cursor-pointer hover:bg-green-800 hover:text-white">Add Customer and Place Order</div>
+                    {addCustomer.isPending || addDimensionMutation.isPending || addWorkMutation.isPending || updateDimensionMutations.isPending || customerQuery.isFetching || customerQuery.isLoading? <div> Adding Data....</div> : <div onClick={onAddCustomerHandler} className="border rounded-2xl p-2 cursor-pointer hover:bg-green-800 hover:text-white">Add Sizes</div>}
                 </div>
             </div>
         </div>

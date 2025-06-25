@@ -57,6 +57,27 @@ export interface CustomerDetailsFromWorkAPIResponse{
     data?:WorkModel
 }
 
+export interface WorkByNameResponse{
+    status : string
+    data : WorkModel[]
+}
+
+export interface CompletedWorkApiResponse {
+    status : string
+    data : []
+}
+
+export interface CompletedWorkByNameResponse{
+    status:string
+    data:WorkModel[]
+}
+
+export interface CompletedWorkByPhoneResponse{
+    status:string
+    data:WorkModel[]
+}
+
+//TODO : ====================================================== CHANGE THIS AFTER DEPLOYMENT
 const API_BASE_URL : string = 'http://localhost:3000'
 
 //API Request to get all customers
@@ -80,6 +101,9 @@ export async function fetchCategory(){
 //API Request to get customers by phone
 export async function fetchCustomerByPhone(phone:string){
     const response = await axios.get(`${API_BASE_URL}/customers/${phone}`)
+    if (response.status===404){
+        return "Not Found"
+    }
     return response.data
 }
 
@@ -97,6 +121,8 @@ export async function updateDimensions(dimensions:UpdateDimensionsAPI){
 }
 
 export async function addWork(workData:WorkModel) : Promise<WorkModel> {
+
+    //Invalidate API
     const response = await axios.post(`${API_BASE_URL}/add_work`, workData)
     return response.data
 }
@@ -113,5 +139,29 @@ export async function searchPendingWork(phone : string) : Promise<SearchWorkAPIR
 
 export async function getPendingWorkDetailsById(id:string) : Promise<CustomerDetailsFromWorkAPIResponse>{
     const response = await axios.get(`${API_BASE_URL}/work_list/customer/${id}`)
+    return response.data
+}
+
+export async function getWorkByName(name:string) : Promise<WorkByNameResponse>{
+    const response = await axios.get(`${API_BASE_URL}/work_list/name/${name}`)
+    return response.data
+}
+
+export async function updateWorkStatus(id:string){
+    await axios.patch(`${API_BASE_URL}/mark_complete/${id}`)
+}
+
+export async function getCompletedWork() : Promise<CompletedWorkApiResponse>{
+    const response = await axios.get(`${API_BASE_URL}/work_list/completed`)
+    return response.data
+}
+
+export async function getCompletedWorkByName(name:string) : Promise<CompletedWorkByNameResponse>{
+    const response = await axios.get(`${API_BASE_URL}/work_list/completed/name/${name}`)
+    return response.data
+}
+
+export async function getCompletedWorkByPhone(phone:string) : Promise<CompletedWorkByPhoneResponse>{
+    const response = await axios.get(`${API_BASE_URL}/work_list/completed/phone/${phone}`)
     return response.data
 }

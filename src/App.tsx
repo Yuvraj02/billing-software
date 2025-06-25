@@ -11,6 +11,8 @@ import AddCategory from "./pages/AddCategory"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Customers from "./features/customers/all_customers/Customers"
+import ContentToPrint from "./features/orders/generate_bill/ContentToPrint"
+import CompletedWork from "./features/orders/work/completed_work/CompletedWork"
 
 const router = createBrowserRouter([
     {
@@ -28,11 +30,16 @@ const router = createBrowserRouter([
         {
           path:"/all_customers",
           element:<Customers/>
+        },
+        {
+          path:"/print",
+          element:<ContentToPrint />
+        },
+        {
+          path:"/completed_work",
+          element:<CompletedWork/>
         }
-        // {
-        //   path: "/work_details/:id",
-        //   element:<CustomerProfileModal/>
-        // }
+
       ]
     }
   ])

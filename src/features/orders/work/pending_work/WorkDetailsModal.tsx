@@ -1,13 +1,17 @@
 import { MdClose } from "react-icons/md"
-import sanjhikala_logo from "../../../assets/sanjhikala_logo.jpg"
+import sanjhikala_logo from "../../../../assets/sanjhikala_logo.jpg"
 import { MdDoneOutline } from "react-icons/md";
-import type { WorkModel } from "../../../models/WorkModel";
+import type { WorkModel } from "../../../../models/WorkModel";
+import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateWorkStatus } from "../../api";
+import type React from "react";
 
 
 interface CustomerModal {
     isOpen: boolean
     onClose: () => void
-    workModel:WorkModel
+    setOpenModal: React.Dispatch<React.SetStateAction<boolean>>
+    workModel: WorkModel
 }
 
 function WorkDetailsModal(prop: CustomerModal) {
@@ -28,6 +32,18 @@ function WorkDetailsModal(prop: CustomerModal) {
         ["bottom", "Bottom"]
     ]
     )
+
+    const queryClient: QueryClient = useQueryClient()
+
+    const updateWork = useMutation({
+        mutationKey: ['mark_complete_work'],
+        mutationFn: (id: string) => updateWorkStatus(id),
+        onSuccess: () => {
+            prop.setOpenModal(false)
+            queryClient.invalidateQueries({ queryKey: ['pending_work'] })
+        }
+    })
+
 
     return (<div className={`fixed inset-0 flex justify-center items-center transition-colors
             ${prop.isOpen ? "visible bg-black/50" : "invisible"}`}>
@@ -52,15 +68,15 @@ function WorkDetailsModal(prop: CustomerModal) {
                     <div>{customer_data.customer_name} </div>
                     <div className="">Category : </div>
                     <div className="">{customer_data.category?.toString()}</div>
-                     <div className="">Date : </div>
+                    <div className="">Date : </div>
                     <div className="">{customer_data.date?.toString()}</div>
                 </div>
-                
+
                 {/* Render Dimensions Table according to the Customer */}
                 <div className="py-4">Sizes Given By Customer For {customer_data.category?.toString()} </div>
                 <div className="grid grid-cols-[auto_1fr] overflow-y-auto w-fit ">
                     {Object.entries(customer_data).map(([key, value]) => {
-                        if (key == "customer_id" || key == "customer_name" || key == "customer_phone" || key == "work_id" || key == "work_status" || key == "date" || key=="category" || key=="customer_email") return (null)
+                        if (key == "customer_id" || key == "customer_name" || key == "customer_phone" || key == "work_id" || key == "work_status" || key == "date" || key == "category" || key == "customer_email") return (null)
                         const columnName = columnMap.get(key)
                         return (<>
                             <div key={key + 1} className="border p-2">{columnName}</div>
@@ -71,7 +87,7 @@ function WorkDetailsModal(prop: CustomerModal) {
             </div>
             <div className="flex gap-2 justify-end">
                 <div onClick={prop.onClose} className="flex gap-1 border-1 rounded-xl p-2 hover:bg-red-500 hover:text-amber-50 cursor-pointer">Close <MdClose className="mt-1" /></div>
-                <div className="flex gap-1 border-1 rounded-xl p-2 hover:bg-green-500 hover:text-amber-50 cursor-pointer">Mark as complete <MdDoneOutline className="mt-1" /></div>
+                <div onClick={() => updateWork.mutate(prop.workModel.work_id)} className="flex gap-1 border-1 rounded-xl p-2 hover:bg-green-500 hover:text-amber-50 cursor-pointer">Mark as complete <MdDoneOutline className="mt-1" /></div>
             </div>
         </div>
     </div>)

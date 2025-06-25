@@ -2,8 +2,8 @@ import { useState } from "react";
 import { MdMenu } from "react-icons/md";
 import { MdArrowBack } from "react-icons/md";
 import sanjhikala_logo from '../../assets/sanjhikala_logo.jpg'
-import { useAppSelector } from "../../hooks";
-import DropDownMenu from "./DropdownMenu";
+// import { useAppSelector } from "../../hooks";
+// import DropDownMenu from "./DropdownMenu";
 import { NavLink } from "react-router";
 
 //Since this interface has just one piece, we will use the prop directly
@@ -52,8 +52,8 @@ export default Navbar
 
 function ExtendedNavBar({ handleShrinkNav }: { handleShrinkNav: () => void }) {
 
-  const categories = useAppSelector((state) => state.categories.categories)
-  const [trigger, setTrigger] = useState<boolean>(false)
+  // const categories = useAppSelector((state) => state.categories.categories)
+  // const [trigger, setTrigger] = useState<boolean>(false)
 
   return <div className="w-60 border-r rounded-xl flex-col h-screen">
     <div className="w-full  flex justify-end p-2 "><MdArrowBack onClick={handleShrinkNav} className="m-2 text-2xl cursor-pointer" /></div>
@@ -62,10 +62,11 @@ function ExtendedNavBar({ handleShrinkNav }: { handleShrinkNav: () => void }) {
         <NavLink to={"/"} onClick={handleShrinkNav}><li key={'li_item1'} className="border-t p-2 cursor-pointer hover:bg-neutral-900">Home</li></NavLink>
         <NavLink to={"/add_category"} onClick={handleShrinkNav}><li key={'li_item2'} className="border-t p-2 cursor-pointer hover:bg-neutral-900">Add Category</li></NavLink>
         <NavLink to={"/all_customers"}><li className="border-t p-2 cursor-pointer hover:bg-neutral-900" key={'li_item3'}>All Customers</li></NavLink>
-        <li key={'li_item4'} className="">
+        <NavLink to={"/completed_work"}><li className="border-t p-2 cursor-pointer hover:bg-neutral-900" key={'li_item3'}>Completed Work</li></NavLink>
+        {/* <li key={'li_item4'} className="">
           <div key = {'li_item5'} className="relative"><DropDownMenu className="border-t p-2 cursor-pointer hover:bg-neutral-900" buttonText="Categories" setTrigger={setTrigger} trigger={trigger}>
             {categories.map((value, index) => { if (value.category_name == "None") { return (<div key={5173}></div>) } return (<div className="p-2 cursor-pointer hover:bg-neutral-800" key={index}>{value.category_name}</div>) })}
-          </DropDownMenu></div></li>
+          </DropDownMenu></div></li> */}
       </ul>
     </div>
   </div>;
